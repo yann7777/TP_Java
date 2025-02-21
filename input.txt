@@ -1,7 +1,0 @@
-Nouvelle ligne de texte
-Bonjour tout le monde
-Nature est belle
-Neige en hiver
-Automne arrive
-Normalement, ça fonctionne
-Actuellement on va voir si les N seront affichés dans output
