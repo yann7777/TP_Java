@@ -21,13 +21,13 @@ public class ToDoController {
     @Autowired
     private ToDoService toDoService;
 
-    //@Operation(summary = "Récupérer toutes les tâches", description = "Retourne la liste des tâches avec pagination")
+    @Operation(summary = "Récupérer toutes les tâches", description = "Retourne la liste des tâches avec pagination")
     @GetMapping
     public List<ToDo> getAllTasks(Pageable pageable) {
         return toDoService.getAllToDos(pageable).getContent();
     }
 
-    //@Operation(summary = "Récupérer une tâche par ID", description = "Retourne une tâche spécifique par son ID")
+    @Operation(summary = "Récupérer une tâche par ID", description = "Retourne une tâche spécifique par son ID")
     @GetMapping("/{id}")
     public ResponseEntity<ToDo> getTaskById(@PathVariable String id) {
         return ResponseEntity.ok(toDoService.getToDoById(id));
@@ -40,14 +40,14 @@ public class ToDoController {
         return new ResponseEntity<>(createdToDo, HttpStatus.CREATED);
     }
 
-    //@Operation(summary = "Mettre à jour une tâche", description = "Met à jour les détails d'une tâche existante")
+    @Operation(summary = "Mettre à jour une tâche", description = "Met à jour les détails d'une tâche existante")
     @PutMapping("/{id}")
     public ResponseEntity<ToDo> updateTask(@PathVariable String id, @RequestBody ToDo toDo) {
         ToDo updatedToDo = toDoService.updateToDo(id, toDo);
         return ResponseEntity.ok(updatedToDo);
     }
 
-    //@Operation(summary = "Supprimer une tâche", description = "Supprime une tâche spécifique par son ID")
+    @Operation(summary = "Supprimer une tâche", description = "Supprime une tâche spécifique par son ID")
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable String id) {
         toDoService.deleteToDo(id);
