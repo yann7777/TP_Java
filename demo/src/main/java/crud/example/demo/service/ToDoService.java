@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ToDoService {
@@ -43,6 +42,7 @@ public class ToDoService {
     public ToDo updateToDo(Long id, ToDo updateToDo){
         return toDoRepository.findById(id).map(toDo -> {
             toDo.setTitre(updateToDo.getTitre());
+            toDo.setDescription();
             toDo.setStatus(updateToDo.isStatus());
             return toDoRepository.save(toDo);
         }).orElseThrow(() -> new ResourceNotFoundException("La tâche n'a pas été trouvée avec l'id" + id));

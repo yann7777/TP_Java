@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+//import java.util.Optional;
 
 @RestController
 @RequestMapping("/lister")
@@ -26,11 +27,11 @@ public class ToDoController {
             super(message);
         }
     }
-    
 
+    
     @GetMapping
     public List<ToDo> getAllTasks(Pageable pageable) {
-        return toDoService.getAllToDos(pageable);
+        return (List<ToDo>) toDoService.getAllToDos(pageable);
     }
 
     @GetMapping("/{id}")
