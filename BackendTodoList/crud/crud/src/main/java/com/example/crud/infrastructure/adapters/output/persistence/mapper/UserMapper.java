@@ -7,7 +7,8 @@ public class UserMapper {
 
     // Convertir l'entité UserEntity en objet métier User
     public static User toDomain(UserEntity userEntity) {
-        return new User(userEntity.getNom(), userEntity.getPrenom(), userEntity.getEmail(), userEntity.getPassword());
+        return new User(userEntity.getNom(), userEntity.getPrenom(), userEntity.getEmail(), userEntity.getPassword(), userEntity.getRole()
+        );
     }
 
     // Convertir l'objet métier User en entité UserEntity
@@ -17,6 +18,8 @@ public class UserMapper {
         userEntity.setPrenom(user.getPrenom());
         userEntity.setEmail(user.getEmail());
         userEntity.setPassword(user.getPassword());  // Ajouter le mot de passe dans l'entité
+        userEntity.setRole(user.getRole()); // Include role
+
         return userEntity;
     }
 

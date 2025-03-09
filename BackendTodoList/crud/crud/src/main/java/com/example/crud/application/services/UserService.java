@@ -66,4 +66,12 @@ public class UserService implements UserUseCasePort {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
+    @Override
+    public void registerUser(User user) {
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
+        UserEntity userEntity = UserMapper.toEntity(user);
+        userRepository.save(userEntity);
+    }
 }

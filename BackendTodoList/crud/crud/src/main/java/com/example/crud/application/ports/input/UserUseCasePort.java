@@ -16,4 +16,7 @@ public interface UserUseCasePort {
     User updateUser(Long id, String nom, String prenom, String email);
 
     void deleteUser(Long id);
+
+    void registerUser(User user);
+
 }

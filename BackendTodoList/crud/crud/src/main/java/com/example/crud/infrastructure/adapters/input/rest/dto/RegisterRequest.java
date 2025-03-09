@@ -1,29 +1,12 @@
-package com.example.crud.infrastructure.adapters.output.persistence.entity;
+package com.example.crud.infrastructure.adapters.input.rest.dto;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "utilisateur")
-public class UserEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class RegisterRequest {
     private String nom;
     private String prenom;
     private String email;
-    private String password; 
-    private String role; 
-
+    private String password;
 
     // Getters et setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getNom() {
         return nom;
     }
@@ -48,20 +31,11 @@ public class UserEntity {
         this.email = email;
     }
 
-    // Ajout des getters et setters pour le mot de passe
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.crud.infrastructure.adapters.output.persistence;
+package com.example.crud.infrastructure.adapters;
 
 import com.example.crud.application.ports.output.UserRepositoryPort;
 import com.example.crud.domain.model.User;
