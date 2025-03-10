@@ -4,6 +4,8 @@ import com.example.crud.application.services.CustomUserDetailsService;
 import com.example.crud.domain.model.User;
 import com.example.crud.infrastructure.adapters.input.rest.dto.LoginRequest;
 import com.example.crud.infrastructure.adapters.input.rest.dto.RegisterRequest;
+import com.example.crud.infrastructure.config.JwtTokenProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +35,9 @@ public class AuthController {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
@@ -43,17 +48,19 @@ public class AuthController {
                             loginRequest.getPassword()
                     )
             );
-
+    
             // Définition de l'authentification dans le contexte de sécurité
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
+    
             // Récupérer l'utilisateur authentifié
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = userDetailsService.findUserByEmail(userDetails.getUsername());
-
+            String token = jwtTokenProvider.generateToken(userDetails);
+    
             // Renvoyer une réponse JSON de succès avec les informations de l'utilisateur
             Map<String, Object> response = new HashMap<>();
             response.put("message", "User logged in successfully!");
+            response.put("token", token); // Correction : ajouter le token JWT généré
             response.put("user", user); // Ajouter les informations de l'utilisateur
             return ResponseEntity.ok(response);
         } catch (Exception e) {

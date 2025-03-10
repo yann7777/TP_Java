@@ -10,13 +10,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
-    private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    private final UserDetailsService userDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
+
+    public SecurityConfig(UserDetailsService userDetailsService, JwtRequestFilter jwtRequestFilter) {
         this.userDetailsService = userDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
     }
 
     @Bean
@@ -39,8 +43,8 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Désactiver CSRF
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers( "/auth/register", "/auth/login").permitAll()
-            .anyRequest().authenticated() // Toutes les autres requêtes nécessitent une authentification
+                .requestMatchers("/auth/register", "/auth/login").permitAll() // Autoriser l'accès public à ces endpoints
+                .anyRequest().authenticated() // Toutes les autres requêtes nécessitent une authentification
             )
             .formLogin(form -> form
                 .loginPage("/login") 
@@ -53,9 +57,9 @@ public class SecurityConfig {
                 .invalidateHttpSession(true) // Invalider la session
                 .deleteCookies("JSESSIONID") // Supprimer les cookies
                 .permitAll() // Autoriser l'accès à la déconnexion
-            );
+            )
+            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Ajouter le filtre JWT
 
         return http.build();
     }
-
 }
