@@ -18,11 +18,17 @@ import lombok.RequiredArgsConstructor;
 import todolist.create.list.application.services.CustomUserDetailsService;
 
 @Component
-@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils jwtUtils;
+
+    // Si @RequiredArgsConstructor ne fonctionne pas, définissez manuellement le constructeur :
+    public JwtFilter(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.jwtUtils = jwtUtils;
+    }
+
     
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
