@@ -7,19 +7,26 @@ import todolist.create.list.infrasctructure.adapters.output.persistence.entity.U
 
 @Component
 public class UserMapper {
-    
-    public static User toDomain(UserEntity userEntity){
-        User user = new User(userEntity.getPrenom(), userEntity.getNom(), userEntity.getEmail(), userEntity.getPassword());
+
+    public static User toDomain(UserEntity userEntity) {
+        User user = new User(
+            userEntity.getPrenom(),
+            userEntity.getNom(),
+            userEntity.getEmail(),
+            userEntity.getPassword(),
+            userEntity.getRole() 
+        );
         user.setId(userEntity.getId());
         return user;
     }
 
-    public static UserEntity toEntity(User user){
+    public static UserEntity toEntity(User user) {
         UserEntity userEntity = new UserEntity();
         userEntity.setPrenom(user.getPrenom());
         userEntity.setNom(user.getNom());
         userEntity.setEmail(user.getEmail());
         userEntity.setPassword(user.getPassword());
+        userEntity.setRole(user.getRole());
         return userEntity;
     }
 }

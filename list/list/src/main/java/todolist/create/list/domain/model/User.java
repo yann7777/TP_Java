@@ -16,15 +16,19 @@ public class User {
    private String nom;
    private String email;
    private String password;
+   private String role;
 
-   public User(){}
+   public User(){
+    this.role = "ROLE_USER"; // Rôle par défaut
+   }
 
-   public User(String prenom, String nom, String email, String password) {
-        this.nom = nom;
-        this.prenom = prenom;
-        this.email = email;
-        this.password = password;
-    }
+   public User(String prenom, String nom, String email, String password, String role) {
+    this.nom = nom;
+    this.prenom = prenom;
+    this.email = email;
+    this.password = password;
+    this.role = "ROLE_USER"; // Rôle par défaut
+}
 
     public Long getId(){
         return id;
@@ -66,4 +70,11 @@ public class User {
         this.password = password;
     }
 
+    public String getRole(){
+        return role;
+    }
+
+    public void setRole(String role){
+        this.role = role;
+    }
 }
