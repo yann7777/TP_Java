@@ -1,0 +1,101 @@
+package todolist.create.list.application.services;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import todolist.create.list.domain.model.EtatEnum;
+import todolist.create.list.domain.model.Tache;
+import todolist.create.list.infrasctructure.adapters.output.persistence.entity.ProjetEntity;
+import todolist.create.list.infrasctructure.adapters.output.persistence.entity.TacheEntity;
+import todolist.create.list.infrasctructure.adapters.output.persistence.entity.UserEntity;
+import todolist.create.list.infrasctructure.adapters.output.persistence.mapper.TacheMapper;
+import todolist.create.list.infrasctructure.adapters.output.persistence.repository.ProjetRepository;
+import todolist.create.list.infrasctructure.adapters.output.persistence.repository.TacheRepository;
+import todolist.create.list.infrasctructure.adapters.output.persistence.repository.UserRepository;
+import todolist.create.list.application.ports.input.TacheUseCase;
+
+@Service
+public class TacheService implements TacheUseCase {
+
+    private final TacheRepository tacheRepository;
+    private final TacheMapper tacheMapper;
+    private final UserRepository userRepository;
+    private final ProjetRepository projetRepository; // Assurez-vous que cette dépendance est injectée
+
+    public TacheService(TacheRepository tacheRepository, TacheMapper tacheMapper, UserRepository userRepository, ProjetRepository projetRepository) {
+        this.tacheRepository = tacheRepository;
+        this.tacheMapper = tacheMapper;
+        this.userRepository = userRepository;
+        this.projetRepository = projetRepository; // Injection du ProjetRepository
+    }
+
+
+    @Override
+    public Tache createTache(String titre, String description, EtatEnum etat, Long idUser, Long idProjet) {
+        System.out.println("ID utilisateur : " + idUser);
+        System.out.println("ID projet : " + idProjet);
+    
+        // Vérifier que l'utilisateur existe
+        UserEntity user = userRepository.findById(idUser)
+            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID : " + idUser));
+    
+        // Vérifier que le projet existe
+        ProjetEntity projet = projetRepository.findById(idProjet)
+            .orElseThrow(() -> new RuntimeException("Projet non trouvé avec l'ID : " + idProjet));
+    
+        // Créer la tâche
+        Tache tache = new Tache(titre, description, etat, idUser, idProjet);
+        TacheEntity tacheEntity = tacheMapper.toEntity(tache);
+        tacheEntity.setUser(user);
+        tacheEntity.setProjet(projet);
+    
+        // Enregistrer la tâche
+        tacheEntity = tacheRepository.save(tacheEntity);
+        return tacheMapper.toDomain(tacheEntity);
+    }
+
+    @Override
+    public Optional<Tache> getTache(Long id) {
+        Optional<TacheEntity> tacheEntity = tacheRepository.findById(id);
+        return tacheEntity.map(tacheMapper::toDomain);
+    }
+
+    @Override
+    public List<Tache> getAllTaches() {
+        List<TacheEntity> tacheEntities = tacheRepository.findAll();
+        return tacheEntities.stream().map(tacheMapper::toDomain).toList();
+    }
+
+    @Override
+    public Tache saveTache(Tache tache) {
+        TacheEntity tacheEntity = tacheMapper.toEntity(tache);
+        tacheEntity = tacheRepository.save(tacheEntity);
+        return tacheMapper.toDomain(tacheEntity);
+    }
+
+    @Override
+    public Tache updateTache(Long id, String titre, String description, EtatEnum etat) {
+        return tacheRepository.findById(id).map(tacheEntity -> {
+            tacheEntity.setTitre(titre);
+            tacheEntity.setDescription(description);
+            tacheEntity.setEtat(etat);
+            tacheEntity = tacheRepository.save(tacheEntity);
+            return tacheMapper.toDomain(tacheEntity);
+        }).orElseThrow(() -> new RuntimeException("Tâche non trouvée avec l'ID : " + id));
+    }
+
+    @Override
+    public void deleteTache(Long id) {
+        tacheRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Tache> getTachesByUserId(Long idUser) {
+        UserEntity user = userRepository.findById(idUser)
+            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID : " + idUser));
+        List<TacheEntity> tacheEntities = tacheRepository.findByUser(user);
+        return tacheEntities.stream().map(tacheMapper::toDomain).toList();
+    }
+}

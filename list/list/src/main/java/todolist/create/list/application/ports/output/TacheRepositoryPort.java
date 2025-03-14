@@ -1,0 +1,13 @@
+package todolist.create.list.application.ports.output;
+
+import java.util.List;
+import java.util.Optional;
+
+import todolist.create.list.domain.model.Tache;
+
+public interface TacheRepositoryPort {
+    Tache save(Tache tache);
+    Optional<Tache> findById(Long id);
+    List<Tache> findAll();
+    void deleteById(Long id);
+}
