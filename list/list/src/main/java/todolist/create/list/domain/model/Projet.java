@@ -5,14 +5,19 @@ public class Projet {
     private String nom;
     private Long idUser; // Identifiant de l'utilisateur
 
-    // Constructeurs
-    public Projet() {}
+  // Constructeurs
+  public Projet() {}
 
-    public Projet(String nom, Long idUser) {
-        this.nom = nom;
-        this.idUser = idUser;
-    }
+  public Projet(String nom, Long idUser) {
+    this.nom = nom;
+    this.idUser = idUser;
+}
 
+  public Projet(Long id, String nom, Long idUser) { // Ajoutez ce constructeur
+      this.id = id;
+      this.nom = nom;
+      this.idUser = idUser;
+  }
     // Getters et setters
     public Long getId() {
         return id;

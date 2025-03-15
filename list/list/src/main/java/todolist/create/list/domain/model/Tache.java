@@ -10,6 +10,15 @@ public class Tache {
 
     public Tache(){}
 
+    public Tache(Long id,String titre, String description, EtatEnum etat, Long idUser, Long idProjet){
+        this.id = id;
+        this.titre = titre;
+        this.description = description;
+        this.etat = etat;
+        this.idUser = idUser;
+        this.idProjet = idProjet;
+    }
+
     public Tache(String titre, String description, EtatEnum etat, Long idUser, Long idProjet){
         this.titre = titre;
         this.description = description;

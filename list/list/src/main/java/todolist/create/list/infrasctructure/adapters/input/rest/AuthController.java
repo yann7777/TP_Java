@@ -2,6 +2,8 @@ package todolist.create.list.infrasctructure.adapters.input.rest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import todolist.create.list.application.ports.input.TacheUseCase;
 import todolist.create.list.application.services.CustomUserDetailsService;
+import todolist.create.list.domain.model.Tache;
 import todolist.create.list.domain.model.User;
 import todolist.create.list.infrasctructure.config.JwtUtils;
 
@@ -27,13 +32,16 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final TacheUseCase tachePort; // Ajoutez cette ligne
+
 
     // Si @RequiredArgsConstructor ne fonctionne pas, définissez manuellement le constructeur :
-    public AuthController(CustomUserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder) {
+    public AuthController(CustomUserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, TacheUseCase tachePort) {
         this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
+        this.tachePort = tachePort;
     }
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
@@ -62,8 +70,8 @@ public class AuthController {
     }
 
 
-    @PostMapping("/login")
-public ResponseEntity<Object> login(@RequestBody User user) {
+    /*@PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody User user) {
     try {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'email est obligatoire");
@@ -104,8 +112,57 @@ public ResponseEntity<Object> login(@RequestBody User user) {
         log.error("Échec de l'authentification pour l'utilisateur : {}", user.getEmail(), e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Échec de l'authentification");
     }
-}
+}*/
 
-    
-    
+
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody User user) {
+        try {
+            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'email est obligatoire");
+            }
+            if (user.getPassword() == null || user.getPassword().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est obligatoire");
+            }
+
+            // Récupérer l'utilisateur depuis la base de données
+            User existingUser = userDetailsService.findUserByEmail(user.getEmail());
+            log.info("Utilisateur trouvé : {}", existingUser.getEmail());
+
+            // Vérifier si le mot de passe correspond
+            if (!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+                log.error("Mot de passe incorrect pour l'utilisateur : {}", user.getEmail());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou mot de passe incorrect");
+            }
+
+            // Authentification avec Spring Security
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+            );
+            log.info("Authentification réussie pour l'utilisateur : {}", user.getEmail());
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String token = jwtUtils.generateToken(userDetails.getUsername());
+            log.info("Token généré pour l'utilisateur : {}", user.getEmail());
+
+            // Récupérer les tâches de l'utilisateur
+            List<Tache> taches = tachePort.getTachesByUserId(existingUser.getId()); // Utilisez tachePort ici
+
+            // Créer la réponse avec le token et les informations de l'utilisateur
+            Map<String, Object> authData = new HashMap<>();
+            authData.put("token", token);
+            authData.put("type", "Bearer");
+            authData.put("user", existingUser); // Inclure les informations de l'utilisateur
+            authData.put("taches", taches); // Inclure les tâches de l'utilisateur
+
+            return ResponseEntity.ok(authData);
+        } catch (UsernameNotFoundException e) {
+            log.error("Utilisateur non trouvé : {}", user.getEmail(), e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou mot de passe incorrect");
+        } catch (AuthenticationException e) {
+            log.error("Échec de l'authentification pour l'utilisateur : {}", user.getEmail(), e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Échec de l'authentification");
+        }
+    }
 }
+    

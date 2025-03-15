@@ -16,8 +16,9 @@ public class ProjetMapper {
 
     public Projet toDomain(ProjetEntity projetEntity) {
         return new Projet(
-            projetEntity.getNom(),
-            projetEntity.getUser().getId() // Récupérer l'ID de l'utilisateur
+            projetEntity.getId(), // ID du projet
+            projetEntity.getNom(), // Nom du projet
+            projetEntity.getUser().getId() // ID de l'utilisateur
         );
     }
 

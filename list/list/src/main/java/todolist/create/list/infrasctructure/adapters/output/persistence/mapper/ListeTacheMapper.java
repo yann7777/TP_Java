@@ -26,8 +26,8 @@ public class ListeTacheMapper {
 
     public ListeTache toDomain(ListeTacheEntity listeTacheEntity) {
         return new ListeTache(
+            listeTacheEntity.getId(), // ID du projet
             listeTacheEntity.getDescription(),
-            listeTacheEntity.getEtat(),
             listeTacheEntity.getUser().getId(),  // Utilisateur ID
             listeTacheEntity.getProjet().getId(), // Projet ID (et non ProjetEntity)
             listeTacheEntity.getTache().getId()   // Tâche ID

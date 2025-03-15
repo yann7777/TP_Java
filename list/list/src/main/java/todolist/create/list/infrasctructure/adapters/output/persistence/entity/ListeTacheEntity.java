@@ -1,5 +1,6 @@
 package todolist.create.list.infrasctructure.adapters.output.persistence.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,6 +12,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import todolist.create.list.domain.model.EtatEnum;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+
 @Entity
 @Table(name = "listetache")
 public class ListeTacheEntity {
@@ -21,6 +27,10 @@ public class ListeTacheEntity {
 
     @Enumerated(EnumType.STRING)
     private EtatEnum etat;
+
+    @CreationTimestamp // Génère automatiquement la date lors de l'insertion
+    @Column(name = "date", nullable = false, updatable = false) // Ne pas permettre la mise à jour manuelle
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -80,6 +90,14 @@ public class ListeTacheEntity {
 
     public void setEtat(EtatEnum etat){
         this.etat = etat;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
 }

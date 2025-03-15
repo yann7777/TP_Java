@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService { // Implémentez UserDetailsService
+public class CustomUserDetailsService implements UserDetailsService { 
 
     private final UserRepository userRepository;
 
@@ -58,5 +58,12 @@ public UserDetails loadUserByUsername(String email) throws UsernameNotFoundExcep
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
         return UserMapper.toDomain(userEntity);
     }
+
+        // Ajoutez cette méthode pour récupérer l'ID de l'utilisateur
+        public Long findUserIdByEmail(String email) {
+            UserEntity userEntity = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+            return userEntity.getId(); // Retourne l'ID de l'utilisateur
+        }
 }
 

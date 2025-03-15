@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,29 +18,49 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import todolist.create.list.application.ports.input.ProjetUseCase;
+import todolist.create.list.application.services.CustomUserDetailsService;
 import todolist.create.list.domain.model.Projet;
 
 @RestController
 @RequestMapping("/projets")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "**")
 public class ProjetController {
     
     private final ProjetUseCase projetUseCase;
+    private final CustomUserDetailsService userDetailsService; // Injectez CustomUserDetailsService
 
-    public ProjetController(ProjetUseCase projetUseCase) {
+
+    public ProjetController(ProjetUseCase projetUseCase, CustomUserDetailsService userDetailsService) {
         this.projetUseCase = projetUseCase;
+        this.userDetailsService = userDetailsService;
     }
 
 
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<Projet> createProjet(@RequestBody Projet projet) {
         return ResponseEntity.ok(projetUseCase.createProjet(
             projet.getNom(),
             projet.getIdUser()
         ));
+    }*/
+
+    @PostMapping
+    public ResponseEntity<Projet> createProjet(@RequestBody Projet projet) {
+        // Récupérer l'utilisateur connecté à partir du contexte de sécurité
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // Récupère l'email de l'utilisateur
+
+        // Récupérer l'ID de l'utilisateur à partir de son email
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        // Créer le projet avec l'ID de l'utilisateur connecté
+        Projet createdProjet = projetUseCase.createProjet(
+            projet.getNom(),
+            userId // Utiliser l'ID de l'utilisateur connecté
+        );
+
+        return ResponseEntity.ok(createdProjet);
     }
-
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Projet> getProjet(@PathVariable Long id) {
@@ -54,6 +76,20 @@ public class ProjetController {
     @GetMapping
     public ResponseEntity<List<Projet>> getAllProjets() {
         List<Projet> projets = projetUseCase.getAllProjets();
+        return new ResponseEntity<>(projets, HttpStatus.OK);
+    }
+
+    @GetMapping("/mes-projets")
+    public ResponseEntity<List<Projet>> getProjetsByUser() {
+        // Récupérer l'utilisateur connecté
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // Récupère l'email de l'utilisateur
+
+        // Récupérer l'ID de l'utilisateur à partir de son email
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        // Récupérer les projets de l'utilisateur
+        List<Projet> projets = projetUseCase.getProjetsByUserId(userId);
         return new ResponseEntity<>(projets, HttpStatus.OK);
     }
 

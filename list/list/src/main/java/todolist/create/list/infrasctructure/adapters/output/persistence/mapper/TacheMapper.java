@@ -21,6 +21,7 @@ public class TacheMapper {
 
     public Tache toDomain(TacheEntity tacheEntity) {
         return new Tache(
+            tacheEntity.getId(),
             tacheEntity.getTitre(),
             tacheEntity.getDescription(),
             tacheEntity.getEtat(),

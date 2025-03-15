@@ -33,6 +33,7 @@ public class ProjetService implements ProjetUseCase{
         return projetMapper.toDomain(projetEntity); 
     }
 
+
     @Override
     public Optional<Projet> getProjet(Long id) {
         Optional<ProjetEntity> projetEntity = projetRepository.findById(id);
@@ -65,5 +66,16 @@ public class ProjetService implements ProjetUseCase{
         ProjetEntity projetEntity = projetMapper.toEntity(projet);
         projetEntity = projetRepository.save(projetEntity);
         return projetMapper.toDomain(projetEntity);
+    }
+
+    @Override
+    public List<Projet> getProjetsByUserId(Long userId) {
+        // Récupérer les projets de l'utilisateur à partir du repository
+        List<ProjetEntity> projetEntities = projetRepository.findByUserId(userId);
+
+        // Convertir les entités en domain models
+        return projetEntities.stream()
+                .map(projetMapper::toDomain)
+                .toList();
     }
 }

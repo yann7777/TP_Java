@@ -31,6 +31,12 @@ public class JwtFilter extends OncePerRequestFilter {
     
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
+
+    // Autoriser les requêtes OPTIONS sans vérifier le token JWT
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        filterChain.doFilter(request, response);
+        return;
+    }
         final String authHeader = request.getHeader("Authorization");
 
         String username = null;

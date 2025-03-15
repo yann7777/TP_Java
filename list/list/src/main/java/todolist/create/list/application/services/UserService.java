@@ -22,7 +22,6 @@ public class UserService implements UserUseCase {
 
     @Override
     public User createUser(String prenom, String nom, String email, String password) {
-    
         User user = new User(prenom, nom, email, password);
         UserEntity userEntity = UserMapper.toEntity(user);
         userEntity = userRepository.save(userEntity);

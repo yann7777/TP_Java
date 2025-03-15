@@ -1,4 +1,4 @@
-/*package todolist.create.list.infrasctructure.config;
+package todolist.create.list.infrasctructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +14,10 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Applique CORS à toutes les routes
                         .allowedOrigins("http://localhost:3000") // Autorise ton frontend React
-                        .allowedMethods("GET", "POST", "PUT", "DELETE") // Méthodes autorisées
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Méthodes autorisées
                         .allowedHeaders("*") // Autorise tous les headers
                         .allowCredentials(true);
             }
         };
     }
 }
-*/

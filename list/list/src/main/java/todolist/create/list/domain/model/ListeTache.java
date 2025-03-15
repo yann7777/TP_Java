@@ -3,6 +3,8 @@ package todolist.create.list.domain.model;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
+
 
 public class ListeTache {
     @Id
@@ -10,11 +12,30 @@ public class ListeTache {
     private Long id;
     private String description;
     private EtatEnum etat;
+    private LocalDateTime date;
     private Long idUser;
     private Long idProjet;
     private Long idTache;
 
     public ListeTache(){}
+
+
+    public ListeTache(Long id, String description, Long idUser, Long idProjet, Long idTache) {
+        this.id = id;
+        this.description = description;
+        this.idUser = idUser;
+        this.idProjet = idProjet;
+        this.idTache = idTache;
+    }
+
+    public ListeTache(Long id, String description, EtatEnum etat, Long idUser, Long idProjet, Long idTache){
+        this.id = id;
+        this.description = description;
+        this.etat = etat;
+        this.idUser = idUser;
+        this.idProjet = idProjet;
+        this.idTache = idTache;
+    }
 
     public ListeTache(String description, EtatEnum etat, Long idUser, Long idProjet, Long idTache){
         this.description = description;
@@ -46,6 +67,14 @@ public class ListeTache {
 
     public void setEtat(EtatEnum etat){
         this.etat = etat;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
     public Long getIdUser(){
