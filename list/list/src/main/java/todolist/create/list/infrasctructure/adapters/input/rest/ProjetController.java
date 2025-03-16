@@ -1,6 +1,7 @@
 package todolist.create.list.infrasctructure.adapters.input.rest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -36,14 +37,6 @@ public class ProjetController {
     }
 
 
-    /*@PostMapping
-    public ResponseEntity<Projet> createProjet(@RequestBody Projet projet) {
-        return ResponseEntity.ok(projetUseCase.createProjet(
-            projet.getNom(),
-            projet.getIdUser()
-        ));
-    }*/
-
     @PostMapping
     public ResponseEntity<Projet> createProjet(@RequestBody Projet projet) {
         // Récupérer l'utilisateur connecté à partir du contexte de sécurité
@@ -73,6 +66,7 @@ public class ProjetController {
         }
     }
 
+    
     @GetMapping
     public ResponseEntity<List<Projet>> getAllProjets() {
         List<Projet> projets = projetUseCase.getAllProjets();
@@ -94,13 +88,37 @@ public class ProjetController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Projet> updateProjet(@PathVariable Long id, @RequestBody String nom) {
-        Projet updatedProjet = projetUseCase.updateProjet(id, nom);
-        
-        if (updatedProjet != null) {
-            return new ResponseEntity<>(updatedProjet, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Projet> updateProjet(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> requestBody) {
+        try {
+            // Récupérer l'utilisateur connecté
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Refuser l'accès si non authentifié
+            }
+
+            // Récupérer l'email de l'utilisateur connecté
+            String username = authentication.getName(); // Récupère l'email de l'utilisateur
+
+            // Récupérer l'ID de l'utilisateur à partir de son email
+            Long userId = userDetailsService.findUserIdByEmail(username); // Utilisez CustomUserDetailsService
+
+            // Récupérer le nouveau nom du projet depuis le corps de la requête
+            String nouveauNom = requestBody.get("nom");
+
+            // Mettre à jour le projet
+            Projet updatedProjet = projetUseCase.updateProjet(id, nouveauNom, userId);
+
+            if (updatedProjet != null) {
+                return ResponseEntity.ok(updatedProjet);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            // Log l'erreur
+            System.err.println("Erreur lors de la mise à jour du projet : " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

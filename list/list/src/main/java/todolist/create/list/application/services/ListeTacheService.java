@@ -29,13 +29,6 @@ public class ListeTacheService implements ListeTacheUseCase {
         return listeTacheMapper.toDomain(listeTacheEntity);
     }
 
-    /*@Override
-    public ListeTache createListeTache(String description, EtatEnum etat, Long idProjet, Long idTache, Long idUser) {
-        ListeTache listeTache = new ListeTache(description, etat, idProjet, idTache, idUser);
-        ListeTacheEntity listeTacheEntity = listeTacheMapper.toEntity(listeTache);
-        listeTacheEntity = listeTacheRepository.save(listeTacheEntity);
-        return listeTacheMapper.toDomain(listeTacheEntity);
-    }*/
 
     @Override
     public ListeTache createListeTache(String description, EtatEnum etat, Long idProjet, Long idTache, Long idUser) {

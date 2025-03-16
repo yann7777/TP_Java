@@ -10,7 +10,7 @@ public interface ProjetUseCase{
     Optional<Projet> getProjet(Long id);
     List<Projet> getAllProjets();
     Projet saveProjet(Projet projet);
-    Projet updateProjet(Long id, String nom);
+    Projet updateProjet(Long id, String nom, Long idUser);
     void deleteProjet(Long id);
     List<Projet> getProjetsByUserId(Long userId); // Récupérer les projets par ID utilisateur
 

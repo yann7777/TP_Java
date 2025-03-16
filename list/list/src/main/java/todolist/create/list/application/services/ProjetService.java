@@ -47,13 +47,24 @@ public class ProjetService implements ProjetUseCase{
     }
 
     @Override
-    public Projet updateProjet(Long id, String nom) {
+    public Projet updateProjet(Long id, String nom, Long userId) {
+        System.out.println("Tentative de mise à jour du projet ID " + id + " par l'utilisateur ID " + userId);
+    
         return projetRepository.findById(id).map(projetEntity -> {
+            System.out.println("Projet trouvé : " + projetEntity.getNom() + ", propriétaire : " + projetEntity.getUser().getId());
+    
+            if (!projetEntity.getUser().getId().equals(userId)) {
+                System.out.println("Accès refusé : l'utilisateur n'est pas le propriétaire du projet.");
+                throw new SecurityException("Vous n'êtes pas autorisé à modifier ce projet.");
+            }
+    
             projetEntity.setNom(nom);
             projetEntity = projetRepository.save(projetEntity);
-            return projetMapper.toDomain(projetEntity); 
+            return projetMapper.toDomain(projetEntity);
         }).orElseThrow(() -> new RuntimeException("Projet non trouvé avec l'ID : " + id));
     }
+
+
 
     @Override
     public void deleteProjet(Long id) {
