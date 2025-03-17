@@ -67,10 +67,24 @@ public class ProjetService implements ProjetUseCase{
 
 
     @Override
-    public void deleteProjet(Long id) {
-        projetRepository.deleteById(id);
+    public void deleteProjet(Long id, Long userId) {
+        System.out.println("Tentative de suppression du projet ID " + id + " par l'utilisateur ID " + userId);
+    
+        projetRepository.findById(id).map(projetEntity -> {
+            System.out.println("Projet trouvé : " + projetEntity.getNom() + ", propriétaire : " + projetEntity.getUser().getId());
+    
+            // Vérifier si l'utilisateur est le propriétaire du projet
+            if (!projetEntity.getUser().getId().equals(userId)) {
+                System.out.println("Accès refusé : l'utilisateur n'est pas le propriétaire du projet.");
+                throw new SecurityException("Vous n'êtes pas autorisé à supprimer ce projet.");
+            }
+    
+            // Supprimer le projet
+            projetRepository.deleteById(id);
+            System.out.println("Projet supprimé avec succès.");
+            return projetEntity; // Retourner l'entité pour le map (non utilisé ici)
+        }).orElseThrow(() -> new RuntimeException("Projet non trouvé avec l'ID : " + id));
     }
-
 
     @Override
     public Projet saveProjet(Projet projet) {

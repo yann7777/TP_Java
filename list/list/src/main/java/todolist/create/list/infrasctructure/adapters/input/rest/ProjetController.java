@@ -122,14 +122,36 @@ public class ProjetController {
         }
     }
 
+    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProjet(@PathVariable Long id) {
-        Optional<Projet> projetOptional = projetUseCase.getProjet(id);
-        if (projetOptional.isPresent()) {
-            projetUseCase.deleteProjet(id);
+        try {
+            // Récupérer l'utilisateur connecté
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Refuser l'accès si non authentifié
+            }
+    
+            // Récupérer l'email de l'utilisateur connecté
+            String username = authentication.getName(); // Récupère l'email de l'utilisateur
+    
+            // Récupérer l'ID de l'utilisateur à partir de son email
+            Long userId = userDetailsService.findUserIdByEmail(username); // Utilisez CustomUserDetailsService
+    
+            // Supprimer le projet
+            projetUseCase.deleteProjet(id, userId); // Appel du service adapté
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Accès refusé
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Projet non trouvé
+        } catch (Exception e) {
+            // Log l'erreur
+            System.err.println("Erreur lors de la suppression du projet : " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
 }

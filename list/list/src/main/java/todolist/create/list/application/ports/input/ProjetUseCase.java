@@ -11,7 +11,7 @@ public interface ProjetUseCase{
     List<Projet> getAllProjets();
     Projet saveProjet(Projet projet);
     Projet updateProjet(Long id, String nom, Long idUser);
-    void deleteProjet(Long id);
+    void deleteProjet(Long id, Long userId);
     List<Projet> getProjetsByUserId(Long userId); // Récupérer les projets par ID utilisateur
 
 }
