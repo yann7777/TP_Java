@@ -1,5 +1,6 @@
 package todolist.create.list.infrasctructure.adapters.output.persistence.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-
 @Entity
 @Table(name = "listetache")
 public class ListeTacheEntity {
@@ -32,18 +32,19 @@ public class ListeTacheEntity {
     @Column(name = "date", nullable = false, updatable = false) // Ne pas permettre la mise à jour manuelle
     private LocalDateTime date;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "projet_id", nullable = false)
     private ProjetEntity projet;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "tache_id", nullable = false)
     private TacheEntity tache;
 
+    // Getters et setters
     public Long getId(){
         return id;
     }
@@ -99,5 +100,4 @@ public class ListeTacheEntity {
     public void setDate(LocalDateTime date) {
         this.date = date;
     }
-
 }

@@ -1,5 +1,6 @@
 package todolist.create.list.application.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class TacheService implements TacheUseCase {
 
 
     @Override
-    public Tache createTache(String titre, String description, EtatEnum etat, Long idUser, Long idProjet) {
+    public Tache createTache(String titre, String description, EtatEnum etat, Long idUser, Long idProjet, LocalDateTime dateRappel) {
         System.out.println("ID utilisateur : " + idUser);
         System.out.println("ID projet : " + idProjet);
     
@@ -46,7 +47,7 @@ public class TacheService implements TacheUseCase {
             .orElseThrow(() -> new RuntimeException("Projet non trouvé avec l'ID : " + idProjet));
     
         // Créer la tâche
-        Tache tache = new Tache(titre, description, etat, idUser, idProjet);
+        Tache tache = new Tache(titre, description, etat, idUser, idProjet, dateRappel);
         TacheEntity tacheEntity = tacheMapper.toEntity(tache);
         tacheEntity.setUser(user);
         tacheEntity.setProjet(projet);
@@ -76,11 +77,12 @@ public class TacheService implements TacheUseCase {
     }
 
     @Override
-    public Tache updateTache(Long id, String titre, String description, EtatEnum etat) {
+    public Tache updateTache(Long id, String titre, String description, EtatEnum etat, LocalDateTime dateRappel) {
         return tacheRepository.findById(id).map(tacheEntity -> {
             tacheEntity.setTitre(titre);
             tacheEntity.setDescription(description);
             tacheEntity.setEtat(etat);
+            tacheEntity.setDateRappel(dateRappel);
             tacheEntity = tacheRepository.save(tacheEntity);
             return tacheMapper.toDomain(tacheEntity);
         }).orElseThrow(() -> new RuntimeException("Tâche non trouvée avec l'ID : " + id));

@@ -1,5 +1,7 @@
 package todolist.create.list.domain.model;
 
+import java.time.LocalDateTime;
+
 public class Tache {
     private Long id;
     private String titre;
@@ -7,24 +9,27 @@ public class Tache {
     private EtatEnum etat;
     private Long idUser;
     private Long idProjet;
+    private LocalDateTime dateRappel;
 
     public Tache(){}
 
-    public Tache(Long id,String titre, String description, EtatEnum etat, Long idUser, Long idProjet){
+    public Tache(Long id, String titre, String description, EtatEnum etat, Long idUser, Long idProjet, LocalDateTime dateRappel){
         this.id = id;
         this.titre = titre;
         this.description = description;
         this.etat = etat;
         this.idUser = idUser;
         this.idProjet = idProjet;
+        this.dateRappel = dateRappel;
     }
 
-    public Tache(String titre, String description, EtatEnum etat, Long idUser, Long idProjet){
+    public Tache(String titre, String description, EtatEnum etat, Long idUser, Long idProjet, LocalDateTime dateRappel){
         this.titre = titre;
         this.description = description;
         this.etat = etat;
         this.idUser = idUser;
         this.idProjet = idProjet;
+        this.dateRappel = dateRappel;
     }
 
     public Long getId(){
@@ -75,4 +80,13 @@ public class Tache {
         this.idProjet = idProjet;
     }
 
+    public LocalDateTime getDateRappel() {
+        return dateRappel;
+    }
+
+    public void setDateRappel(LocalDateTime dateRappel) {
+        this.dateRappel = dateRappel;
+    }
+
+    
 }

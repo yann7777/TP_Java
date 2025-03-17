@@ -1,5 +1,6 @@
 package todolist.create.list.infrasctructure.adapters.output.persistence.entity;
 
+import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -8,8 +9,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 import todolist.create.list.domain.model.EtatEnum;
+import java.util.List;
 
 @Entity
 @Table(name = "tache")
@@ -21,15 +25,20 @@ public class TacheEntity {
     private String description;
     @Enumerated(EnumType.STRING)
     private EtatEnum etat;
+    private LocalDateTime dateRappel;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "projet_id", nullable = false)
     private ProjetEntity projet;
 
+    @OneToMany(mappedBy = "tache", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ListeTacheEntity> listeTaches;
+
+    // Getters et setters
     public Long getId(){
         return id;
     }
@@ -76,5 +85,21 @@ public class TacheEntity {
 
     public void setProjet(ProjetEntity projet){
         this.projet = projet;
+    }
+
+    public LocalDateTime getDateRappel(){
+        return dateRappel;
+    }
+
+    public void setDateRappel(LocalDateTime dateRappel){
+        this.dateRappel = dateRappel;
+    }
+
+    public List<ListeTacheEntity> getListeTaches() {
+        return listeTaches;
+    }
+
+    public void setListeTaches(List<ListeTacheEntity> listeTaches) {
+        this.listeTaches = listeTaches;
     }
 }

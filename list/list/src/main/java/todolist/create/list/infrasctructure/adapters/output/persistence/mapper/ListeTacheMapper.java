@@ -30,7 +30,9 @@ public class ListeTacheMapper {
             listeTacheEntity.getDescription(),
             listeTacheEntity.getUser().getId(),  // Utilisateur ID
             listeTacheEntity.getProjet().getId(), // Projet ID (et non ProjetEntity)
-            listeTacheEntity.getTache().getId()   // Tâche ID
+            listeTacheEntity.getTache().getId(),   // Tâche ID
+            listeTacheEntity.getDate(),
+            listeTacheEntity.getEtat()
         );
     }
 

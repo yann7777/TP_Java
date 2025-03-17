@@ -43,14 +43,15 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
         this.tachePort = tachePort;
     }
+    
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody User user) {
         try {
             if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'email est obligatoire");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "L'email est obligatoire"));
             }
             if (user.getPassword() == null || user.getPassword().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est obligatoire");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Le mot de passe est obligatoire"));
             }
     
             log.info("Tentative d'enregistrement de l'utilisateur : {}", user.getEmail());
@@ -62,10 +63,10 @@ public class AuthController {
             userDetailsService.registerUser(user);
             log.info("Utilisateur enregistré avec succès : {}", user.getEmail());
     
-            return ResponseEntity.ok("Utilisateur enregistré avec succès");
+            return ResponseEntity.ok(Map.of("message", "Utilisateur enregistré avec succès"));
         } catch (Exception e) {
             log.error("Erreur lors de l'enregistrement de l'utilisateur : {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'enregistrement");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Erreur lors de l'enregistrement"));
         }
     }
 

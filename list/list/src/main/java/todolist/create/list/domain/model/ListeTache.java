@@ -20,7 +20,7 @@ public class ListeTache {
     public ListeTache(){}
 
 
-    public ListeTache(Long id, String description, Long idUser, Long idProjet, Long idTache) {
+    public ListeTache(Long id, String description, Long idUser, Long idProjet, Long idTache, LocalDateTime date, EtatEnum etat) {
         this.id = id;
         this.description = description;
         this.idUser = idUser;

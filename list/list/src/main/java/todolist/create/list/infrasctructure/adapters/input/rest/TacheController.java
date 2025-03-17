@@ -12,8 +12,10 @@ import todolist.create.list.application.services.CustomUserDetailsService;
 import todolist.create.list.domain.model.Projet;
 import todolist.create.list.domain.model.Tache;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/taches")
@@ -45,42 +47,6 @@ public class TacheController {
         return ResponseEntity.ok(taches);
     }
 
-    /*@PostMapping
-    public ResponseEntity<Tache> createTache(@RequestBody Tache tache) {
-        System.out.println("ID utilisateur : " + tache.getIdUser());
-        System.out.println("ID projet : " + tache.getIdProjet()); // Ajoutez ce log pour vérifier
-    
-        return ResponseEntity.ok(tachePort.createTache(
-            tache.getTitre(),
-            tache.getDescription(),
-            tache.getEtat(),
-            tache.getIdUser(),
-            tache.getIdProjet() // Assurez-vous que ce champ est utilisé
-        ));
-    }*/
-
-    /*@PostMapping
-    public ResponseEntity<Tache> createTache(@RequestBody Tache tache) {
-        // Récupérer l'utilisateur connecté à partir du contexte de sécurité
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Récupère l'email de l'utilisateur
-
-        // Récupérer l'ID de l'utilisateur à partir de son email
-        Long userId = userDetailsService.findUserIdByEmail(username);
-
-        // Créer la tâche avec l'ID de l'utilisateur
-        Tache createdTache = tachePort.createTache(
-            tache.getTitre(),
-            tache.getDescription(),
-            tache.getEtat(),
-            userId, // Utiliser l'ID de l'utilisateur connecté
-            tache.getIdProjet() // Si nécessaire
-        );
-
-        return ResponseEntity.ok(createdTache);
-    }*/
-
-
     @PostMapping
     public ResponseEntity<Tache> createTache(@RequestBody Tache tache) {
         try {
@@ -101,7 +67,8 @@ public class TacheController {
                 tache.getDescription(),
                 tache.getEtat(),
                 userId, // Utiliser l'ID de l'utilisateur connecté
-                tache.getIdProjet() // Si nécessaire
+                tache.getIdProjet(), // Si nécessaire
+                tache.getDateRappel()
             );
     
             // Log la tâche créée
@@ -153,12 +120,24 @@ public class TacheController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Tache> updateTache(@PathVariable Long id, @RequestBody Tache updatedTache) {
-        return ResponseEntity.ok(tachePort.updateTache(id, updatedTache.getTitre(), updatedTache.getDescription(), updatedTache.getEtat()));
+        return ResponseEntity.ok(tachePort.updateTache(id, updatedTache.getTitre(), updatedTache.getDescription(), updatedTache.getEtat(), updatedTache.getDateRappel()));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTache(@PathVariable Long id) {
         tachePort.deleteTache(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/rappels")
+    public ResponseEntity<List<Tache>> getTachesAvecRappels() {
+        LocalDateTime maintenant = LocalDateTime.now();
+        List<Tache> taches = tachePort.getAllTaches();
+
+        List<Tache> tachesAvecRappels = taches.stream()
+            .filter(tache -> tache.getDateRappel() != null && tache.getDateRappel().isBefore(maintenant))
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(tachesAvecRappels);
     }
 }
