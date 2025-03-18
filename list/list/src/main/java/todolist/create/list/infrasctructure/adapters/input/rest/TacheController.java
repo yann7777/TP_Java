@@ -68,7 +68,8 @@ public class TacheController {
                 tache.getEtat(),
                 userId, // Utiliser l'ID de l'utilisateur connecté
                 tache.getIdProjet(), // Si nécessaire
-                tache.getDateRappel()
+                tache.getDateRappel(),
+                tache.isPinned()
             );
     
             // Log la tâche créée
@@ -140,4 +141,33 @@ public class TacheController {
 
         return ResponseEntity.ok(tachesAvecRappels);
     }
+
+    @PostMapping("/{id}/pin")
+    public ResponseEntity<Tache> pinTache(@PathVariable Long id) {
+        // Récupérer l'utilisateur connecté
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // Récupère l'email de l'utilisateur
+
+        // Récupérer l'ID de l'utilisateur à partir de son email
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        // Épingler la tâche
+        Tache tache = tachePort.pinTache(id, userId);
+        return ResponseEntity.ok(tache);
+    }
+
+    @PostMapping("/{id}/unpin")
+    public ResponseEntity<Tache> unpinTache(@PathVariable Long id) {
+        // Récupérer l'utilisateur connecté
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // Récupère l'email de l'utilisateur
+
+        // Récupérer l'ID de l'utilisateur à partir de son email
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        // Désépingler la tâche
+        Tache tache = tachePort.unpinTache(id, userId);
+        return ResponseEntity.ok(tache);
+    }
+
 }

@@ -27,7 +27,8 @@ public class TacheMapper {
             tacheEntity.getEtat(),
             tacheEntity.getUser().getId(),  // Récupérer l'ID de l'utilisateur
             tacheEntity.getProjet().getId(), // Récupérer l'ID du projet
-            tacheEntity.getDateRappel()
+            tacheEntity.getDateRappel(),
+            tacheEntity.isPinned()
         );
     }
 
@@ -37,6 +38,7 @@ public class TacheMapper {
         tacheEntity.setDescription(tache.getDescription());
         tacheEntity.setEtat(tache.getEtat());
         tacheEntity.setDateRappel(tache.getDateRappel());
+        tacheEntity.setPinned(tache.isPinned());
     
         // Récupérer l'utilisateur par son ID
         UserEntity user = userRepository.findById(tache.getIdUser())

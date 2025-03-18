@@ -26,6 +26,7 @@ public class TacheEntity {
     @Enumerated(EnumType.STRING)
     private EtatEnum etat;
     private LocalDateTime dateRappel;
+    private boolean pinned;
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -101,5 +102,13 @@ public class TacheEntity {
 
     public void setListeTaches(List<ListeTacheEntity> listeTaches) {
         this.listeTaches = listeTaches;
+    }
+
+    public boolean isPinned(){
+        return pinned;
+    }
+
+    public void setPinned(boolean pinned){
+        this.pinned = pinned;
     }
 }
