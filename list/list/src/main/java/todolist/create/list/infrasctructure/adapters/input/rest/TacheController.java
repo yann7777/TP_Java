@@ -119,15 +119,47 @@ public class TacheController {
         return ResponseEntity.ok(taches);
     }
 
-    @PutMapping("/{id}")
+    /*@PutMapping("/{id}")
     public ResponseEntity<Tache> updateTache(@PathVariable Long id, @RequestBody Tache updatedTache) {
         return ResponseEntity.ok(tachePort.updateTache(id, updatedTache.getTitre(), updatedTache.getDescription(), updatedTache.getEtat(), updatedTache.getDateRappel()));
-    }
+    }*/
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/{id}")
+    public ResponseEntity<Tache> updateTache(@PathVariable Long id, @RequestBody Tache updatedTache) {
+    // Récupérer l'utilisateur connecté
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName(); // Récupère l'email de l'utilisateur
+
+    // Récupérer l'ID de l'utilisateur à partir de son email
+    Long userId = userDetailsService.findUserIdByEmail(username);
+    
+    try {
+        Tache tache = tachePort.updateTache(id, updatedTache.getTitre(), updatedTache.getDescription(), updatedTache.getEtat(), updatedTache.getDateRappel(), userId);
+        return ResponseEntity.ok(tache);
+    } catch (RuntimeException e) { return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); }
+}
+
+    /*@DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTache(@PathVariable Long id) {
         tachePort.deleteTache(id);
         return ResponseEntity.noContent().build();
+    }*/
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTache(@PathVariable Long id) {
+        // Récupérer l'utilisateur connecté
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // Récupère l'email de l'utilisateur
+
+        // Récupérer l'ID de l'utilisateur à partir de son email
+        Long userId = userDetailsService.findUserIdByEmail(username);
+        
+        try {
+            tachePort.deleteTache(id, userId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @GetMapping("/rappels")

@@ -77,15 +77,20 @@ public class TacheService implements TacheUseCase {
     }
 
     @Override
-    public Tache updateTache(Long id, String titre, String description, EtatEnum etat, LocalDateTime dateRappel) {
-        return tacheRepository.findById(id).map(tacheEntity -> {
-            tacheEntity.setTitre(titre);
-            tacheEntity.setDescription(description);
-            tacheEntity.setEtat(etat);
-            tacheEntity.setDateRappel(dateRappel);
-            tacheEntity = tacheRepository.save(tacheEntity);
-            return tacheMapper.toDomain(tacheEntity);
-        }).orElseThrow(() -> new RuntimeException("Tâche non trouvée avec l'ID : " + id));
+    public Tache updateTache(Long id, String titre, String description, EtatEnum etat, LocalDateTime dateRappel, Long userId) {
+        TacheEntity tacheEntity = tacheRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Tâche non trouvée avec l'ID : " + id));
+        
+        if (!tacheEntity.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Vous n'êtes pas autorisé à modifier cette tâche.");
+        }
+        
+        tacheEntity.setTitre(titre);
+        tacheEntity.setDescription(description);
+        tacheEntity.setEtat(etat);
+        tacheEntity.setDateRappel(dateRappel);
+        tacheEntity = tacheRepository.save(tacheEntity);
+        return tacheMapper.toDomain(tacheEntity);
     }
 
     @Override
@@ -119,7 +124,14 @@ public class TacheService implements TacheUseCase {
     }
 
     @Override
-    public void deleteTache(Long id) {
+    public void deleteTache(Long id, Long userId) {
+        TacheEntity tacheEntity = tacheRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Tâche non trouvée avec l'ID : " + id));
+        
+        if (!tacheEntity.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Vous n'êtes pas autorisé à supprimer cette tâche.");
+        }
+        
         tacheRepository.deleteById(id);
     }
 

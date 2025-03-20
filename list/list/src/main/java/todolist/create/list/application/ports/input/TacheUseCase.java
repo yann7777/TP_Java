@@ -12,9 +12,9 @@ public interface TacheUseCase {
     Optional<Tache> getTache(Long id);
     List<Tache> getAllTaches();
     Tache saveTache(Tache tache);
-    Tache updateTache(Long id, String titre, String description, EtatEnum etat, LocalDateTime dateRappel);
+    Tache updateTache(Long id, String titre, String description, EtatEnum etat, LocalDateTime dateRappel, Long userId);
     List<Tache> getTachesByUserId(Long idUser);
-    void deleteTache(Long id);
+    void deleteTache(Long id, Long userId);
     Tache pinTache(Long id, Long userId);
     Tache unpinTache(Long id, Long userId);
 }
