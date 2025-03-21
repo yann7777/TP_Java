@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/taches")
@@ -23,8 +26,8 @@ import java.util.stream.Collectors;
 public class TacheController {
 
     private final TacheUseCase tachePort;
-    private final CustomUserDetailsService userDetailsService; // Injectez CustomUserDetailsService
-    private final ProjetUseCase projetUseCase; // Injectez ProjetUseCase
+    private final CustomUserDetailsService userDetailsService;
+    private final ProjetUseCase projetUseCase; 
 
 
     public TacheController(TacheUseCase tachePort, CustomUserDetailsService userDetailsService, ProjetUseCase projetUseCase) {
@@ -35,14 +38,10 @@ public class TacheController {
 
     @GetMapping("/mes-taches")
     public ResponseEntity<List<Tache>> getTachesByUser() {
-        // Récupérer l'utilisateur connecté
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Récupère l'email de l'utilisateur
-
-        // Récupérer l'ID de l'utilisateur à partir de son email
+        String username = authentication.getName();
         Long userId = userDetailsService.findUserIdByEmail(username);
 
-        // Récupérer les tâches de l'utilisateur
         List<Tache> taches = tachePort.getTachesByUserId(userId);
         return ResponseEntity.ok(taches);
     }
@@ -50,34 +49,29 @@ public class TacheController {
     @PostMapping
     public ResponseEntity<Tache> createTache(@RequestBody Tache tache) {
         try {
-            // Récupérer l'utilisateur connecté
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Refuser l'accès si non authentifié
             }
     
-            String username = authentication.getName(); // Récupère l'email de l'utilisateur
+            String username = authentication.getName();
     
-            // Récupérer l'ID de l'utilisateur à partir de son email
             Long userId = userDetailsService.findUserIdByEmail(username);
     
-            // Créer la tâche avec l'ID de l'utilisateur
             Tache createdTache = tachePort.createTache(
                 tache.getTitre(),
                 tache.getDescription(),
                 tache.getEtat(),
-                userId, // Utiliser l'ID de l'utilisateur connecté
-                tache.getIdProjet(), // Si nécessaire
+                userId, 
+                tache.getIdProjet(), 
                 tache.getDateRappel(),
                 tache.isPinned()
             );
     
-            // Log la tâche créée
             System.out.println("Tâche créée : " + createdTache);
     
             return ResponseEntity.ok(createdTache);
         } catch (Exception e) {
-            // Log l'erreur
             System.err.println("Erreur lors de la création de la tâche : " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -85,14 +79,11 @@ public class TacheController {
 
     @GetMapping("/projets")
     public ResponseEntity<List<Projet>> getProjetsByUser() {
-        // Récupérer l'utilisateur connecté à partir du contexte de sécurité
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Récupère l'email de l'utilisateur
+        String username = authentication.getName();
 
-        // Récupérer l'ID de l'utilisateur à partir de son email
         Long userId = userDetailsService.findUserIdByEmail(username);
 
-        // Récupérer les projets de l'utilisateur
         List<Projet> projets = projetUseCase.getProjetsByUserId(userId);
 
         return ResponseEntity.ok(projets);
@@ -119,18 +110,12 @@ public class TacheController {
         return ResponseEntity.ok(taches);
     }
 
-    /*@PutMapping("/{id}")
-    public ResponseEntity<Tache> updateTache(@PathVariable Long id, @RequestBody Tache updatedTache) {
-        return ResponseEntity.ok(tachePort.updateTache(id, updatedTache.getTitre(), updatedTache.getDescription(), updatedTache.getEtat(), updatedTache.getDateRappel()));
-    }*/
 
     @PutMapping("/{id}")
     public ResponseEntity<Tache> updateTache(@PathVariable Long id, @RequestBody Tache updatedTache) {
-    // Récupérer l'utilisateur connecté
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String username = authentication.getName(); // Récupère l'email de l'utilisateur
+    String username = authentication.getName();
 
-    // Récupérer l'ID de l'utilisateur à partir de son email
     Long userId = userDetailsService.findUserIdByEmail(username);
     
     try {
@@ -139,20 +124,13 @@ public class TacheController {
     } catch (RuntimeException e) { return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); }
 }
 
-    /*@DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTache(@PathVariable Long id) {
-        tachePort.deleteTache(id);
-        return ResponseEntity.noContent().build();
-    }*/
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTache(@PathVariable Long id) {
-        // Récupérer l'utilisateur connecté
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Récupère l'email de l'utilisateur
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
 
-        // Récupérer l'ID de l'utilisateur à partir de son email
-        Long userId = userDetailsService.findUserIdByEmail(username);
+            Long userId = userDetailsService.findUserIdByEmail(username);
         
         try {
             tachePort.deleteTache(id, userId);
@@ -176,30 +154,38 @@ public class TacheController {
 
     @PostMapping("/{id}/pin")
     public ResponseEntity<Tache> pinTache(@PathVariable Long id) {
-        // Récupérer l'utilisateur connecté
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Récupère l'email de l'utilisateur
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
 
-        // Récupérer l'ID de l'utilisateur à partir de son email
         Long userId = userDetailsService.findUserIdByEmail(username);
 
-        // Épingler la tâche
         Tache tache = tachePort.pinTache(id, userId);
         return ResponseEntity.ok(tache);
     }
 
     @PostMapping("/{id}/unpin")
     public ResponseEntity<Tache> unpinTache(@PathVariable Long id) {
-        // Récupérer l'utilisateur connecté
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Récupère l'email de l'utilisateur
-
-        // Récupérer l'ID de l'utilisateur à partir de son email
+        String username = authentication.getName();
         Long userId = userDetailsService.findUserIdByEmail(username);
 
-        // Désépingler la tâche
         Tache tache = tachePort.unpinTache(id, userId);
         return ResponseEntity.ok(tache);
     }
+
+
+    @GetMapping("/rechercher")
+    public ResponseEntity<List<Tache>> rechercherTaches(@RequestParam(required = false) String terme) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+        List<Tache> taches = tachePort.rechercherTaches(userId, terme);
+        if (taches.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } 
+
+        return ResponseEntity.ok(taches);
+    }
+    
 
 }

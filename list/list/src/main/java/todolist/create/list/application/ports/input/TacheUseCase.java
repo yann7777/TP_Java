@@ -17,4 +17,5 @@ public interface TacheUseCase {
     void deleteTache(Long id, Long userId);
     Tache pinTache(Long id, Long userId);
     Tache unpinTache(Long id, Long userId);
+    List<Tache> rechercherTaches(Long idUser, String terme);
 }

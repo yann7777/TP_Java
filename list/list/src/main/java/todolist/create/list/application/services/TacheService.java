@@ -135,6 +135,22 @@ public class TacheService implements TacheUseCase {
         tacheRepository.deleteById(id);
     }
 
+
+    @Override
+    public List<Tache> rechercherTaches(Long idUser, String terme) {
+        UserEntity user = userRepository.findById(idUser)
+            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + idUser));
+        List<TacheEntity> tacheEntities;
+        if (terme == null || terme.trim().isEmpty()) {
+            tacheEntities = tacheRepository.findByUser(user);
+        } else {
+            tacheEntities = tacheRepository.findByUserAndTitreContainingIgnoreCaseOrUserAndDescriptionContainingIgnoreCase(
+                user, terme, user, terme);
+        }
+        return tacheEntities.stream().map(tacheMapper::toDomain).toList();
+    }
+
+
     @Override
     public List<Tache> getTachesByUserId(Long idUser) {
         UserEntity user = userRepository.findById(idUser)
