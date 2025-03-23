@@ -49,7 +49,7 @@ public class TacheController {
     @PostMapping
     public ResponseEntity<Tache> createTache(@RequestBody Tache tache) {
         try {
-                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Refuser l'accès si non authentifié
             }

@@ -23,13 +23,13 @@ public class TacheService implements TacheUseCase {
     private final TacheRepository tacheRepository;
     private final TacheMapper tacheMapper;
     private final UserRepository userRepository;
-    private final ProjetRepository projetRepository; // Assurez-vous que cette dépendance est injectée
+    private final ProjetRepository projetRepository; 
 
     public TacheService(TacheRepository tacheRepository, TacheMapper tacheMapper, UserRepository userRepository, ProjetRepository projetRepository) {
         this.tacheRepository = tacheRepository;
         this.tacheMapper = tacheMapper;
         this.userRepository = userRepository;
-        this.projetRepository = projetRepository; // Injection du ProjetRepository
+        this.projetRepository = projetRepository; 
     }
 
 

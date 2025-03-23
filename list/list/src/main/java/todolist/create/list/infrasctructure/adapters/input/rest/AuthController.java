@@ -32,10 +32,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-    private final TacheUseCase tachePort; // Ajoutez cette ligne
+    private final TacheUseCase tachePort;
 
-
-    // Si @RequiredArgsConstructor ne fonctionne pas, définissez manuellement le constructeur :
     public AuthController(CustomUserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, TacheUseCase tachePort) {
         this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;

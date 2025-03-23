@@ -28,28 +28,24 @@ import todolist.create.list.domain.model.Projet;
 public class ProjetController {
     
     private final ProjetUseCase projetUseCase;
-    private final CustomUserDetailsService userDetailsService; // Injectez CustomUserDetailsService
-
+    private final CustomUserDetailsService userDetailsService; 
 
     public ProjetController(ProjetUseCase projetUseCase, CustomUserDetailsService userDetailsService) {
         this.projetUseCase = projetUseCase;
         this.userDetailsService = userDetailsService;
     }
 
-
     @PostMapping
     public ResponseEntity<Projet> createProjet(@RequestBody Projet projet) {
         // Récupérer l'utilisateur connecté à partir du contexte de sécurité
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Récupère l'email de l'utilisateur
-
-        // Récupérer l'ID de l'utilisateur à partir de son email
+        String username = authentication.getName(); 
         Long userId = userDetailsService.findUserIdByEmail(username);
 
         // Créer le projet avec l'ID de l'utilisateur connecté
         Projet createdProjet = projetUseCase.createProjet(
             projet.getNom(),
-            userId // Utiliser l'ID de l'utilisateur connecté
+            userId
         );
 
         return ResponseEntity.ok(createdProjet);
@@ -75,14 +71,10 @@ public class ProjetController {
 
     @GetMapping("/mes-projets")
     public ResponseEntity<List<Projet>> getProjetsByUser() {
-        // Récupérer l'utilisateur connecté
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Récupère l'email de l'utilisateur
-
-        // Récupérer l'ID de l'utilisateur à partir de son email
+        String username = authentication.getName();
         Long userId = userDetailsService.findUserIdByEmail(username);
 
-        // Récupérer les projets de l'utilisateur
         List<Projet> projets = projetUseCase.getProjetsByUserId(userId);
         return new ResponseEntity<>(projets, HttpStatus.OK);
     }
@@ -92,17 +84,15 @@ public class ProjetController {
             @PathVariable Long id,
             @RequestBody Map<String, String> requestBody) {
         try {
-            // Récupérer l'utilisateur connecté
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Refuser l'accès si non authentifié
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); 
             }
 
             // Récupérer l'email de l'utilisateur connecté
-            String username = authentication.getName(); // Récupère l'email de l'utilisateur
+            String username = authentication.getName();
 
-            // Récupérer l'ID de l'utilisateur à partir de son email
-            Long userId = userDetailsService.findUserIdByEmail(username); // Utilisez CustomUserDetailsService
+            Long userId = userDetailsService.findUserIdByEmail(username);
 
             // Récupérer le nouveau nom du projet depuis le corps de la requête
             String nouveauNom = requestBody.get("nom");
@@ -116,7 +106,6 @@ public class ProjetController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-            // Log l'erreur
             System.err.println("Erreur lors de la mise à jour du projet : " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -127,8 +116,7 @@ public class ProjetController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProjet(@PathVariable Long id) {
         try {
-            // Récupérer l'utilisateur connecté
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Refuser l'accès si non authentifié
             }
@@ -136,7 +124,6 @@ public class ProjetController {
             // Récupérer l'email de l'utilisateur connecté
             String username = authentication.getName(); // Récupère l'email de l'utilisateur
     
-            // Récupérer l'ID de l'utilisateur à partir de son email
             Long userId = userDetailsService.findUserIdByEmail(username); // Utilisez CustomUserDetailsService
     
             // Supprimer le projet
@@ -147,7 +134,6 @@ public class ProjetController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Projet non trouvé
         } catch (Exception e) {
-            // Log l'erreur
             System.err.println("Erreur lors de la suppression du projet : " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

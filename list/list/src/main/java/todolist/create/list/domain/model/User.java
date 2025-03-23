@@ -18,12 +18,10 @@ public class User {
     private String password;
     private String role;
 
-    // Constructeur par défaut
     public User() {
         this.role = "ROLE_USER"; // Rôle par défaut
     }
 
-    // Constructeur avec 4 paramètres
     public User(String prenom, String nom, String email, String password) {
         this.prenom = prenom;
         this.nom = nom;

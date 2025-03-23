@@ -30,7 +30,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User createdUser = userPort.createUser(user.getNom(), user.getPrenom(), user.getEmail(), user.getPassword());
-        return ResponseEntity.ok(createdUser);  // Renvoie l'utilisateur avec l'ID généré
+        return ResponseEntity.ok(createdUser); 
     }
 
     @GetMapping("/{id}")

@@ -27,7 +27,7 @@ import todolist.create.list.domain.model.ListeTache;
 public class ListeTacheController {
     
      private final ListeTacheUseCase listeTachePort;
-    private final CustomUserDetailsService userDetailsService; // Injectez CustomUserDetailsService
+    private final CustomUserDetailsService userDetailsService;
 
     public ListeTacheController(ListeTacheUseCase listeTachePort, CustomUserDetailsService userDetailsService) {
         this.listeTachePort = listeTachePort;
@@ -38,32 +38,26 @@ public class ListeTacheController {
     @PostMapping
     public ResponseEntity<ListeTache> createListeTache(@RequestBody ListeTache listeTache) {
         try {
-            // Récupérer l'utilisateur connecté
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Refuser l'accès si non authentifié
             }
 
         String username = authentication.getName(); // Récupère l'email de l'utilisateur
-
-        // Récupérer l'ID de l'utilisateur à partir de son email
         Long userId = userDetailsService.findUserIdByEmail(username);
 
-        // Créer la tâche avec l'ID de l'utilisateur
         ListeTache createdListeTache = listeTachePort.createListeTache(
             listeTache.getDescription(),
             listeTache.getEtat(),
             listeTache.getIdProjet(),
             listeTache.getIdTache(),
-            userId // Utiliser l'ID de l'utilisateur connecté
+            userId 
         );
 
-        // Log la tâche créée
         System.out.println("Liste de tâches créée : " + createdListeTache);
 
         return ResponseEntity.ok(createdListeTache);
     } catch (Exception e) {
-        // Log l'erreur
         System.err.println("Erreur lors de la création de la tâche : " + e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
@@ -72,14 +66,11 @@ public class ListeTacheController {
 
     @GetMapping("/mes-listetaches")
     public ResponseEntity<List<ListeTache>> getListeTachesByUser() {
-        // Récupérer l'utilisateur connecté
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName(); // Récupère l'email de l'utilisateur
 
-        // Récupérer l'ID de l'utilisateur à partir de son email
         Long userId = userDetailsService.findUserIdByEmail(username);
 
-        // Récupérer les listes de tâches de l'utilisateur
         List<ListeTache> listeTaches = listeTachePort.getListTachesByUserId(userId);
         return ResponseEntity.ok(listeTaches);
     }    
