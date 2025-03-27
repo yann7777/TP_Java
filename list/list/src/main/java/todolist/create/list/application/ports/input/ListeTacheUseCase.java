@@ -14,5 +14,6 @@ public interface ListeTacheUseCase {
     ListeTache updateListeTache(Long id, String description, EtatEnum etat);
     void deleteListeTache(Long id);
     List<ListeTache> getListTachesByUserId(Long idUser);
-
+    List<ListeTache> getListTachesByTacheId(Long tacheId);
+    ListeTache moveListeToTache(Long listeId, Long newTacheId, Long userId);
 }

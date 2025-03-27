@@ -8,4 +8,5 @@ import todolist.create.list.infrasctructure.adapters.output.persistence.entity.L
 
 public interface ListeTacheRepository extends JpaRepository<ListeTacheEntity, Long>{
     List<ListeTacheEntity> findByUserId(Long idUser);
+    List<ListeTacheEntity> findByTacheId(Long tacheId);
 }

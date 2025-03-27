@@ -8,7 +8,7 @@ import todolist.create.list.domain.model.EtatEnum;
 import todolist.create.list.domain.model.Tache;
 
 public interface TacheUseCase {
-    Tache createTache(String titre, String description, EtatEnum etat, Long idUser, Long idProjet, LocalDateTime dateRappel, boolean pinned);
+    Tache createTache(String titre, String description, EtatEnum etat, Long idUser, Long idProjet, LocalDateTime dateRappel, boolean pinned, boolean archived);
     Optional<Tache> getTache(Long id);
     List<Tache> getAllTaches();
     Tache saveTache(Tache tache);
@@ -18,4 +18,10 @@ public interface TacheUseCase {
     Tache pinTache(Long id, Long userId);
     Tache unpinTache(Long id, Long userId);
     List<Tache> rechercherTaches(Long idUser, String terme);
+    Tache assignTache(Long tacheId, Long assigneeId, Long currentUserId);
+    Tache unassignTache(Long tacheId, Long currentUserId);
+    List<Tache> getAssignedTaches(Long userId);
+    Tache archivedTache(Long id, Long userId);
+    Tache unarchivedTache(Long id, Long userId);
+    List<Tache> getArchivedTaches(Long userId);
 }

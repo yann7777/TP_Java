@@ -2,14 +2,18 @@ package todolist.create.list.application.services;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import todolist.create.list.application.ports.input.ListeTacheUseCase;
 import todolist.create.list.domain.model.EtatEnum;
 import todolist.create.list.domain.model.ListeTache;
 import todolist.create.list.infrasctructure.adapters.output.persistence.entity.ListeTacheEntity;
+import todolist.create.list.infrasctructure.adapters.output.persistence.entity.TacheEntity;
 import todolist.create.list.infrasctructure.adapters.output.persistence.mapper.ListeTacheMapper;
 import todolist.create.list.infrasctructure.adapters.output.persistence.repository.ListeTacheRepository;
+import todolist.create.list.infrasctructure.adapters.output.persistence.repository.TacheRepository;
 
 @Service
 public class ListeTacheService implements ListeTacheUseCase {
@@ -76,10 +80,45 @@ public class ListeTacheService implements ListeTacheUseCase {
         }).orElseThrow(() -> new RuntimeException("Liste de tâches non trouvée avec l'ID : " + id));
     }
     
+    @Override
+    public List<ListeTache> getListTachesByTacheId(Long tacheId) {
+        List<ListeTacheEntity> listeTacheEntities = listeTacheRepository.findByTacheId(tacheId);
+        return listeTacheEntities.stream()
+                .map(listeTacheMapper::toDomain)
+                .toList();
+    }
 
     @Override
     public void deleteListeTache(Long id) {
         listeTacheRepository.deleteById(id);
+    }
+
+
+    @Autowired
+    private TacheRepository tacheRepository;
+
+    @Override
+    public ListeTache moveListeToTache(Long listeId, Long newTacheId, Long userId) {
+        ListeTacheEntity liste = listeTacheRepository.findById(listeId)
+            .orElseThrow(() -> new RuntimeException("Liste non trouvée"));
+        
+        // Vérifier que l'utilisateur est propriétaire de la liste
+        if (!liste.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Non autorisé");
+        }
+        
+        TacheEntity nouvelleTache = tacheRepository.findById(newTacheId)
+            .orElseThrow(() -> new RuntimeException("Tâche non trouvée"));
+        
+        // Vérifier que l'utilisateur est propriétaire de la nouvelle tâche
+        if (!nouvelleTache.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Non autorisé");
+        }
+        
+        liste.setTache(nouvelleTache);
+        liste = listeTacheRepository.save(liste);
+        
+        return listeTacheMapper.toDomain(liste);
     }
 }
 

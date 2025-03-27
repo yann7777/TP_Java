@@ -16,8 +16,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+
+
 
 
 @RestController
@@ -65,7 +70,8 @@ public class TacheController {
                 userId, 
                 tache.getIdProjet(), 
                 tache.getDateRappel(),
-                tache.isPinned()
+                tache.isPinned(),
+                tache.isArchived()
             );
     
             System.out.println("Tâche créée : " + createdTache);
@@ -186,6 +192,92 @@ public class TacheController {
 
         return ResponseEntity.ok(taches);
     }
+
+    
+    @PostMapping("/{id}/assign")
+    public ResponseEntity<Tache> assignTache(@PathVariable Long id, @RequestParam Long assigneeId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long currentUserId = userDetailsService.findUserIdByEmail(username);
+
+        try {
+            Tache tache = tachePort.assignTache(id, assigneeId, currentUserId);
+            return ResponseEntity.ok(tache);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+    }
+
+    @PostMapping("/{id}/unassign")
+    public ResponseEntity<Tache> unassignTache(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long currentUserId = userDetailsService.findUserIdByEmail(username);
+
+        try {
+            Tache tache = tachePort.unassignTache(id, currentUserId);
+            return ResponseEntity.ok(tache);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+    }
+    
     
 
+    @GetMapping("/assigned-to-me")
+    public ResponseEntity<List<Tache>> getTacheAssignedToMe() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        List<Tache> taches = tachePort.getAssignedTaches(userId);
+
+        return ResponseEntity.ok(taches);
+    }
+    
+
+    @PostMapping("/{id}/archive")
+    public ResponseEntity<Tache> archiveTache(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        try {
+            Tache tache = tachePort.archivedTache(id, userId);
+            return ResponseEntity.ok(tache);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+    }
+
+    @PostMapping("/{id}/unarchive")
+    public ResponseEntity<Tache> unarchiveTache(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        try {
+            Tache tache = tachePort.unarchivedTache(id, userId);
+            return ResponseEntity.ok(tache);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+    }
+
+
+    @GetMapping("/archived")
+    public ResponseEntity<List<Tache>> getArchiveTaches() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        List<Tache> taches = tachePort.getArchivedTaches(userId);
+        return ResponseEntity.ok(taches);
+    }
+    
+    
+    
 }

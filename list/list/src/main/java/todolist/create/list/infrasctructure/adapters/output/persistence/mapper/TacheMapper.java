@@ -26,9 +26,11 @@ public class TacheMapper {
             tacheEntity.getDescription(),
             tacheEntity.getEtat(),
             tacheEntity.getUser().getId(),  // Récupérer l'ID de l'utilisateur
+            tacheEntity.getAssignee() != null ? tacheEntity.getAssignee().getId() : null,
             tacheEntity.getProjet().getId(), // Récupérer l'ID du projet
             tacheEntity.getDateRappel(),
-            tacheEntity.isPinned()
+            tacheEntity.isPinned(),
+            tacheEntity.isArchived()
         );
     }
 
@@ -39,6 +41,7 @@ public class TacheMapper {
         tacheEntity.setEtat(tache.getEtat());
         tacheEntity.setDateRappel(tache.getDateRappel());
         tacheEntity.setPinned(tache.isPinned());
+        tacheEntity.setArchived(tache.isArchived());
     
         // Récupérer l'utilisateur par son ID
         UserEntity user = userRepository.findById(tache.getIdUser())
@@ -49,6 +52,12 @@ public class TacheMapper {
         ProjetEntity projet = projetRepository.findById(tache.getIdProjet())
             .orElseThrow(() -> new RuntimeException("Projet non trouvé avec l'ID : " + tache.getIdProjet()));
         tacheEntity.setProjet(projet);
+
+        if (tache.getIdAssigned() != null) {
+            UserEntity assignee = userRepository.findById(tache.getIdAssigned())
+            .orElseThrow(() -> new RuntimeException("Utilisateur assigné non trouvé avec l'id : " + tache.getIdAssigned()));
+            tacheEntity.setAssignee(assignee);
+        }
     
         return tacheEntity;
     }

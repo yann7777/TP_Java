@@ -27,6 +27,7 @@ public class TacheEntity {
     private EtatEnum etat;
     private LocalDateTime dateRappel;
     private boolean pinned;
+    private boolean archived;
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -38,6 +39,10 @@ public class TacheEntity {
 
     @OneToMany(mappedBy = "tache", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ListeTacheEntity> listeTaches;
+
+    @ManyToOne
+    @JoinColumn(name = "assignee_id")
+    private UserEntity assignee;
 
     // Getters et setters
     public Long getId(){
@@ -110,5 +115,21 @@ public class TacheEntity {
 
     public void setPinned(boolean pinned){
         this.pinned = pinned;
+    }
+
+    public UserEntity getAssignee(){
+        return assignee;
+    }
+
+    public void setAssignee(UserEntity assignee){
+        this.assignee = assignee;
+    }
+
+    public boolean isArchived(){
+        return archived;
+    }
+
+    public void setArchived(boolean archived){
+        this.archived = archived;
     }
 }

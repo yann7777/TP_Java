@@ -2,6 +2,7 @@ package todolist.create.list.infrasctructure.adapters.input.rest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,6 +93,25 @@ public class ListeTacheController {
         return ResponseEntity.ok(listeTachePort.getListTachesByUserId(idUser));
     }
 
+    @GetMapping("/par-tache/{tacheId}")
+    public ResponseEntity<List<ListeTache>> getListTachesByTacheId(@PathVariable Long tacheId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        List<ListeTache> listeTaches = listeTachePort.getListTachesByTacheId(tacheId);
+        
+        listeTaches = listeTaches.stream()
+                .filter(liste -> liste.getIdUser().equals(userId))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(listeTaches);
+    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<ListeTache> updateListeTache(@PathVariable Long id, @RequestBody ListeTache updatedListeTache) {
@@ -106,5 +126,27 @@ public class ListeTacheController {
     public ResponseEntity<Void> deleteListeTache(@PathVariable Long id) {
         listeTachePort.deleteListeTache(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PutMapping("/{id}/movetotache/{newTacheId}")
+        public ResponseEntity<ListeTache> moveListeToTache(
+        @PathVariable Long id, 
+        @PathVariable Long newTacheId) {
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+        
+        try {
+            ListeTache updatedListe = listeTachePort.moveListeToTache(id, newTacheId, userId);
+            return ResponseEntity.ok(updatedListe);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 }
