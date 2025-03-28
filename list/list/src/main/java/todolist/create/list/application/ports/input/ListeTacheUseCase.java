@@ -16,4 +16,8 @@ public interface ListeTacheUseCase {
     List<ListeTache> getListTachesByUserId(Long idUser);
     List<ListeTache> getListTachesByTacheId(Long tacheId);
     ListeTache moveListeToTache(Long listeId, Long newTacheId, Long userId);
+
+    ListeTache completedListeTache(Long id, Long userId);
+    ListeTache uncompletedListeTache(Long id, Long userId);
+    List<ListeTache> getCompletedListeTache(Long id);
 }

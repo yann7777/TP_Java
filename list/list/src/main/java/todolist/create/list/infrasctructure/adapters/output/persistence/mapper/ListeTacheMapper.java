@@ -28,11 +28,12 @@ public class ListeTacheMapper {
         return new ListeTache(
             listeTacheEntity.getId(), // ID du projet
             listeTacheEntity.getDescription(),
-            listeTacheEntity.getUser().getId(),  // Utilisateur ID
-            listeTacheEntity.getProjet().getId(), // Projet ID (et non ProjetEntity)
-            listeTacheEntity.getTache().getId(),   // Tâche ID
+            listeTacheEntity.getUser().getId(),
+            listeTacheEntity.getProjet().getId(), 
+            listeTacheEntity.getTache().getId(), 
             listeTacheEntity.getDate(),
-            listeTacheEntity.getEtat()
+            listeTacheEntity.getEtat(),
+            listeTacheEntity.isCompleted()
         );
     }
 
@@ -41,19 +42,17 @@ public class ListeTacheMapper {
         ListeTacheEntity listeTacheEntity = new ListeTacheEntity();
         listeTacheEntity.setDescription(listeTache.getDescription());
         listeTacheEntity.setEtat(listeTache.getEtat());
+        listeTacheEntity.setCompleted(listeTache.isCompleted());
 
 
-        // Récupérer l'utilisateur à partir de l'ID
         UserEntity user = userRepository.findById(listeTache.getIdUser())
             .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID : " + listeTache.getIdUser()));
         listeTacheEntity.setUser(user);
 
-        // Récupérer la tâche à partir de l'ID
         TacheEntity tache = tacheRepository.findById(listeTache.getIdTache())
             .orElseThrow(() -> new RuntimeException("Tâche non trouvée avec l'ID : " + listeTache.getIdTache()));
         listeTacheEntity.setTache(tache);
 
-            // Récupérer le projet à partir de l'ID
         ProjetEntity projet = projetRepository.findById(listeTache.getIdProjet())
             .orElseThrow(() -> new RuntimeException("Tâche non trouvée avec l'ID : " + listeTache.getIdProjet()));
         listeTacheEntity.setProjet(projet);

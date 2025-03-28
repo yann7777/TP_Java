@@ -22,6 +22,7 @@ import todolist.create.list.application.ports.input.ListeTacheUseCase;
 import todolist.create.list.application.services.CustomUserDetailsService;
 import todolist.create.list.domain.model.ListeTache;
 
+
 @RestController
 @RequestMapping("/listetaches")
 @CrossOrigin(origins = "**")
@@ -149,4 +150,45 @@ public class ListeTacheController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<ListeTache> completeListeTache(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        try {
+            ListeTache listeTache = listeTachePort.completedListeTache(id, userId);
+            return ResponseEntity.ok(listeTache);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+
+    @PostMapping("/{id}/uncomplete")
+public ResponseEntity<ListeTache> uncompleteListeTache(@PathVariable Long id) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    Long userId = userDetailsService.findUserIdByEmail(username);
+
+    try {
+        ListeTache listeTache = listeTachePort.uncompletedListeTache(id, userId);
+        return ResponseEntity.ok(listeTache);
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+}
+
+    @GetMapping("/completed")
+    public ResponseEntity<List<ListeTache>> getCompletedListeTaches() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long userId = userDetailsService.findUserIdByEmail(username);
+
+        List<ListeTache> listeTaches = listeTachePort.getCompletedListeTache(userId);
+        return ResponseEntity.ok(listeTaches);
+    }
+    
+    
 }

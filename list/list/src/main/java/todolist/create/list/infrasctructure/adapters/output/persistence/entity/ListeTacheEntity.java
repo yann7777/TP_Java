@@ -14,7 +14,6 @@ import jakarta.persistence.Table;
 import todolist.create.list.domain.model.EtatEnum;
 
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
@@ -24,11 +23,12 @@ public class ListeTacheEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
+    private boolean completed;
 
     @Enumerated(EnumType.STRING)
     private EtatEnum etat;
 
-    @CreationTimestamp // Génère automatiquement la date lors de l'insertion
+    @CreationTimestamp 
     @Column(name = "date", nullable = false, updatable = false) // Ne pas permettre la mise à jour manuelle
     private LocalDateTime date;
 
@@ -44,7 +44,7 @@ public class ListeTacheEntity {
     @JoinColumn(name = "tache_id", nullable = false)
     private TacheEntity tache;
 
-    // Getters et setters
+    
     public Long getId(){
         return id;
     }
@@ -99,5 +99,13 @@ public class ListeTacheEntity {
 
     public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    public boolean isCompleted(){
+        return completed;
+    }
+
+    public void setCompleted(boolean completed){
+        this.completed = completed;
     }
 }

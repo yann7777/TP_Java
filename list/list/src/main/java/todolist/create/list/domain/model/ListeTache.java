@@ -16,16 +16,18 @@ public class ListeTache {
     private Long idUser;
     private Long idProjet;
     private Long idTache;
+    private boolean completed;
 
     public ListeTache(){}
 
 
-    public ListeTache(Long id, String description, Long idUser, Long idProjet, Long idTache, LocalDateTime date, EtatEnum etat) {
+    public ListeTache(Long id, String description, Long idUser, Long idProjet, Long idTache, LocalDateTime date, EtatEnum etat, boolean completed) {
         this.id = id;
         this.description = description;
         this.idUser = idUser;
         this.idProjet = idProjet;
         this.idTache = idTache;
+        this.completed = completed;
     }
 
     public ListeTache(Long id, String description, EtatEnum etat, Long idUser, Long idProjet, Long idTache){
@@ -99,6 +101,14 @@ public class ListeTache {
 
     public void setIdTache(Long idTache){
         this.idTache = idTache;
+    }
+
+    public boolean isCompleted(){
+        return completed;
+    }
+
+    public void setCompleted(boolean completed){
+        this.completed = completed;
     }
 
 }

@@ -11,19 +11,23 @@ import todolist.create.list.domain.model.EtatEnum;
 import todolist.create.list.domain.model.ListeTache;
 import todolist.create.list.infrasctructure.adapters.output.persistence.entity.ListeTacheEntity;
 import todolist.create.list.infrasctructure.adapters.output.persistence.entity.TacheEntity;
+import todolist.create.list.infrasctructure.adapters.output.persistence.entity.UserEntity;
 import todolist.create.list.infrasctructure.adapters.output.persistence.mapper.ListeTacheMapper;
 import todolist.create.list.infrasctructure.adapters.output.persistence.repository.ListeTacheRepository;
 import todolist.create.list.infrasctructure.adapters.output.persistence.repository.TacheRepository;
+import todolist.create.list.infrasctructure.adapters.output.persistence.repository.UserRepository;
 
 @Service
 public class ListeTacheService implements ListeTacheUseCase {
     
     private final ListeTacheRepository listeTacheRepository;
     private final ListeTacheMapper listeTacheMapper;
+    private final UserRepository userRepository;
 
-    public ListeTacheService(ListeTacheRepository listeTacheRepository, ListeTacheMapper listeTacheMapper) {
+    public ListeTacheService(ListeTacheRepository listeTacheRepository, ListeTacheMapper listeTacheMapper, UserRepository userRepository) {
         this.listeTacheRepository = listeTacheRepository;
         this.listeTacheMapper = listeTacheMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -119,6 +123,47 @@ public class ListeTacheService implements ListeTacheUseCase {
         liste = listeTacheRepository.save(liste);
         
         return listeTacheMapper.toDomain(liste);
+    }
+
+
+    @Override
+    public ListeTache completedListeTache(Long id, Long userId){
+        ListeTacheEntity liste = listeTacheRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Liste de tâche non trouvée"));
+
+        if (!liste.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Non autorisé");
+        }
+
+        liste.setCompleted(true);
+        liste = listeTacheRepository.save(liste);
+
+        return listeTacheMapper.toDomain(liste);
+    }
+
+    @Override
+    public ListeTache uncompletedListeTache(Long id, Long userId){
+        ListeTacheEntity liste = listeTacheRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Liste de sous tâches non autorisées"));
+
+        if (!liste.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Non autorisé");
+        }
+
+        liste.setCompleted(false);
+        liste = listeTacheRepository.save(liste);
+
+        return listeTacheMapper.toDomain(liste);
+    }
+
+    @Override
+    public List<ListeTache> getCompletedListeTache(Long userId){
+        UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new RuntimeException("Utilisateur non autorisé"));
+    
+        List<ListeTacheEntity> listes = listeTacheRepository.findByUserAndCompleted(user, true);
+        
+        return listes.stream().map(listeTacheMapper::toDomain).toList();
     }
 }
 
